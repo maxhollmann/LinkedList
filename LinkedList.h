@@ -20,6 +20,7 @@ struct ListNode
 {
 	T data;
 	ListNode<T> *next;
+	ListNode<T> *prev;
 };
 
 template <typename T>
@@ -29,7 +30,7 @@ protected:
 	int _size;
 	ListNode<T> *root;
 	ListNode<T>	*last;
-
+	ListNode<T> *itr;
 	// Helps "get" method, by saving last position
 	ListNode<T> *lastNodeGot;
 	int lastIndexGot;
@@ -101,6 +102,40 @@ public:
 	*/
 	virtual void sort(int (*cmp)(T &, T &));
 
+	/*
+		Return data pointed to by itr
+	*/
+	virtual T get_itr();
+
+	/*
+		Move itr up one, or wrap back to root
+	*/
+	virtual T next();
+	
+	/*
+		Move itr back one, or wrap back to last
+	*/
+	virtual T prev();
+	
+	/*
+		Set itr to the root item
+	*/
+	virtual T begin();
+	
+	/*
+		Set itr to last item
+	*/
+	virtual T end();
+	
+	/*
+		Check if itr is at begin
+	*/
+	virtual bool isBegin();
+	
+	/*
+		Check if itr is at end
+	*/
+	virtual bool isEnd();
 };
 
 // Initialize LinkedList with false values
@@ -164,7 +199,7 @@ ListNode<T>* LinkedList<T>::getNode(int index){
 		return current;
 	}
 
-	return false;
+	return nullptr;
 }
 
 template<typename T>
@@ -186,7 +221,8 @@ bool LinkedList<T>::add(int index, T _t){
 	tmp->data = _t;
 	tmp->next = _prev->next;
 	_prev->next = tmp;
-
+	tmp->prev = _prev;
+	tmp->next->prev = tmp;
 	_size++;
 	isCached = false;
 
@@ -202,12 +238,14 @@ bool LinkedList<T>::add(T _t){
 	
 	if(root){
 		// Already have elements inserted
+		tmp->prev = last;
 		last->next = tmp;
 		last = tmp;
 	}else{
 		// First element being inserted
 		root = tmp;
 		last = tmp;
+		itr = tmp;
 	}
 
 	_size++;
@@ -224,6 +262,7 @@ bool LinkedList<T>::unshift(T _t){
 
 	ListNode<T> *tmp = new ListNode<T>();
 	tmp->next = root;
+	root->prev = tmp;
 	tmp->data = _t;
 	root = tmp;
 	
@@ -252,6 +291,9 @@ T LinkedList<T>::pop(){
 
 	if(_size >= 2){
 		ListNode<T> *tmp = getNode(_size - 2);
+		if (itr == tmp->next) {
+			itr = tmp;
+		}
 		T ret = tmp->next->data;
 		delete(tmp->next);
 		tmp->next = NULL;
@@ -264,6 +306,7 @@ T LinkedList<T>::pop(){
 		delete(root);
 		root = NULL;
 		last = NULL;
+		itr = NULL;
 		_size = 0;
 		return ret;
 	}
@@ -277,9 +320,12 @@ T LinkedList<T>::shift(){
 	if(_size > 1){
 		ListNode<T> *_next = root->next;
 		T ret = root->data;
+		if (itr == root) {
+			itr = _next;
+		}
 		delete(root);
 		root = _next;
-		_size --;
+		_size--;
 		isCached = false;
 
 		return ret;
@@ -308,7 +354,11 @@ T LinkedList<T>::remove(int index){
 	ListNode<T> *tmp = getNode(index - 1);
 	ListNode<T> *toDelete = tmp->next;
 	T ret = toDelete->data;
+	if (itr == toDelete) {
+		itr = toDelete->next;
+	}
 	tmp->next = tmp->next->next;
+	tmp->next->prev = tmp;
 	delete(toDelete);
 	_size--;
 	isCached = false;
@@ -386,6 +436,11 @@ void LinkedList<T>::sort(int (*cmp)(T &, T &)){
 				joinPoint = &b->next;
 			}
 		}
+		ListNode<T> *tmp = root;
+		while (tmp->next) {
+			tmp->next->prev = tmp;
+			tmp = tmp->next;
+		}
 	}
 }
 
@@ -398,4 +453,77 @@ ListNode<T>* LinkedList<T>::findEndOfSortedString(ListNode<T> *p, int (*cmp)(T &
 	return p;
 }
 
+template<typename T>
+T LinkedList<T>::get_itr() {
+	if (itr) { // Make sure itr is set
+		return itr->data;
+	}
+	else {
+		return T();
+	}
+}
+
+template<typename T>
+T LinkedList<T>::next() {
+	if (itr == NULL) {
+		return T();
+	}
+	else {
+		if (isEnd()) {
+			itr = root;
+		}
+		else {
+			itr = itr->next;
+		}
+	}
+	return itr->data;
+}
+
+template<typename T>
+T LinkedList<T>::prev() {
+	if (itr == NULL) {
+		return T();
+	}
+	else {
+		if (isBegin()) {
+			itr = last;
+		}
+		else {
+			itr = itr->prev;
+		}
+	}
+	return itr->data;
+}
+
+template<typename T>
+T LinkedList<T>::begin() {
+	itr = root;
+	if (itr == NULL) {
+		return T();
+	}
+	else {
+		return itr->data;
+	}
+}
+
+template<typename T>
+T LinkedList<T>::end() {
+	itr = last;
+	if (itr == NULL) {
+		return T();
+	}
+	else {
+		return itr->data;
+	}
+}
+
+template<typename T>
+bool LinkedList<T>::isBegin() {
+	return (itr == root);
+}
+
+template<typename T>
+bool LinkedList<T>::isEnd(){
+	return (itr == last);
+}
 #endif
