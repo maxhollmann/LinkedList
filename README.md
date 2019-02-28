@@ -129,7 +129,7 @@ myList.sort(myComparator);
 // Set iterator to first element
 myList.begin();
 // Print first element
-Serial.println(myList.get_itr());
+Serial.println(myList.itr());
 // Print every item, starting from the second item
 while(!myList.isEnd()) {
   Serial.println(myList.next());
@@ -175,7 +175,7 @@ while(!myList.isEnd()) {
 
 - `void` `LinkedList<T>::sort(int (*cmp)(T &, T &))` - Sorts the linked list according to a comparator funcrion. The comparator should return < 0 if the first argument should be sorted before the second, and > 0 if the first argument should be sorted after the first element. (Same as how `strcmp()` works.)
 
-- `T` `LinkedList<T>::get_itr()` - Returns the data of the node the iterator is currently pointing at.
+- `T` `LinkedList<T>::itr()` - Returns the data of the node the iterator is currently pointing at.
 
 - `T` `LinkedList<T>::next()` - Move the iterator up one. Wraps if called on the last item.
 
@@ -197,7 +197,7 @@ while(!myList.isEnd()) {
 
 ### Version History
 
-* `1.2 (2019-02-28(`: Doubly-Linked nodes implemented. Iterator implemented.
+* `1.2 (2019-02-28)`: Doubly-Linked nodes implemented. Iterator implemented.
 * `1.1 (2013-07-20)`: Cache implemented. Getting subsequent objects is now O(N). Before, O(N^2).
 * `1.0 (2013-07-20)`: Original release
 
