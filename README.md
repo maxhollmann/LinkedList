@@ -1,4 +1,5 @@
 # LinkedList
+This is a fork of [Ivan Seidel's](https://github.com/ivanseidel/LinkedList/) linked list library. It has been modified to be doubly-linked. A single internal iterator has also been added to the List. This was chosen over having externally constructable iterators to minimize the impact of dynamically constructing new iterators. 
 
 This library was developed targeting **`Arduino`** applications. However, works just great with any C++.
 
@@ -123,6 +124,17 @@ myList.clear();
 myList.sort(myComparator);
 ```
 
+#### Iterating the list
+```c++
+// Set iterator to first element
+myList.begin();
+// Print first element
+Serial.println(myList.get_itr());
+// Print every item, starting from the second item
+while(!myList.isEnd()) {
+  Serial.println(myList.next());
+}
+```
 ------------------------
 
 ## Library Reference
@@ -163,6 +175,18 @@ myList.sort(myComparator);
 
 - `void` `LinkedList<T>::sort(int (*cmp)(T &, T &))` - Sorts the linked list according to a comparator funcrion. The comparator should return < 0 if the first argument should be sorted before the second, and > 0 if the first argument should be sorted after the first element. (Same as how `strcmp()` works.)
 
+- `T` `LinkedList<T>::get_itr()` - Returns the data of the node the iterator is currently pointing at.
+
+- `T` `LinkedList<T>::next()` - Move the iterator up one. Wraps if called on the last item.
+
+- `T` `LinkedList<T>::prev()` - Move the iterator back one. Wraps if called on the first item.
+
+- `T` `LinkedList<T>::begin()` - Set the iterator to the first item.
+
+- `bool` `LinkedList<T>::isBegin()` - Return true if the iterator is pointing to the first item.
+
+- `bool` `LinkedList<T>::isEnd()` - Return true if the iterator is pointing to the last item.
+
 - **protected** `int` `LinkedList<T>::_size` - Holds the cached size of the list.
 
 - **protected** `ListNode<T>` `LinkedList<T>::*root` - Holds the root node of the list.
@@ -173,6 +197,7 @@ myList.sort(myComparator);
 
 ### Version History
 
+* `1.2 (2019-02-28(`: Doubly-Linked nodes implemented. Iterator implemented.
 * `1.1 (2013-07-20)`: Cache implemented. Getting subsequent objects is now O(N). Before, O(N^2).
 * `1.0 (2013-07-20)`: Original release
 
